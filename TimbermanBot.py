@@ -31,41 +31,37 @@ def move(x,y):
 def click(pos):
     if pos: # left -> right
         win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN,0,0)
-        sleep_key(0.0005)
         win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP,0,0)
     else: # right -> left
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN,0,0)
-        sleep_key(0.0005)
         win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP,0,0)
-    sleep_key(0.001)
 
 def main():
-
-    plank = cv2.imread(r'Assets\1920\candy_cutttt.png')
+    plank = cv2.imread(r'Assets\1920\candy_cutttt.png', 0)
 
     mss_ = mss.mss()
 
-    left_field = {'left': 2292,
-             'top': 885,
-             'width': 85,
-             'height': 140}
+    left_field = {'left': 2337,
+             'top': 775,
+             'width': 32,
+             'height': 175}
     
-    right_field = {'left': 2579,
-             'top': 885,
-             'width': 85,
-             'height': 140}
+    right_field = {'left': 2585,
+             'top': 775,
+             'width': 32,
+             'height': 175}
 
-    threshold = 0.84
+    threshold = 0.987
 
     position = True # left
     while not(is_key_pressed(0x51)):
 
         if position: # if left grab left field
-            screenshot_r = numpy.array(mss_.grab(left_field))[:,:,:3]
+            screenshot = numpy.array(mss_.grab(left_field))
         else:
-            screenshot_r = numpy.array(mss_.grab(right_field))[:,:,:3]
+            screenshot = numpy.array(mss_.grab(right_field))
 
-        #screenshot_r = cv2.cvtColor(screenshot, cv2.COLOR_RGB2GRAY)
+        screenshot_r = cv2.cvtColor(screenshot, cv2.COLOR_RGB2GRAY)
 
         plank_match = cv2.matchTemplate(screenshot_r,
                                 plank,
@@ -74,22 +70,21 @@ def main():
         _, max_val, _, _ = cv2.minMaxLoc(plank_match)
 
         print(max_val, position)
-        not_position = not position
+
         if max_val > threshold: # FOUND!
             # need to jump off
             click(position)
             print('turn!')
-            sleep_key(0.076)
+            sleep_key(0.055)
             click(position)
-            position = not_position
+            position = not position
         else:
-            click(not_position)
+            click(not position)
         
         cv2.imshow('Footbot', screenshot_r)
         cv2.waitKey(1)
 
-        #sleep_key(0.1217)
-        sleep_key(0.081)
+        sleep_key(0.052)
 
 
 if __name__ == '__main__':
